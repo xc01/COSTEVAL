@@ -404,10 +404,10 @@ img {
 }
 
 .wz-input-group-prepend{
-  background-color: #141a48;
-   border: 1px solid #2d8cf0;
-   border-right: none;
-   color:  #2d8cf0;
+    background-color: #0080ff;
+    border: 1px solid #2d8cf0;
+    border-right: none;
+    color:  #2d8cf0;
 }
 
 .tips{
@@ -432,7 +432,7 @@ img {
 }
 
 body {
-    background-color: #0d1c4d;
+    background-color: #0a35c4;
 }
 
 </style> 

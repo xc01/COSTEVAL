@@ -1,6 +1,9 @@
 <template>
   <div class="hello">
-    <h1>Hello! {{ usr }}</h1>
+    <img alt="Vue logo" class="element-plus-logo" width="50%" src="../assets/logo.gif" />
+    <div class="fontset">
+      <h1 >Hello! {{ usr }}</h1>
+    </div>
     <a href="https://www.baidu.com">指引，如何操作</a>
   </div>
 </template>
@@ -35,5 +38,16 @@ li {
 }
 a {
   color: #42b983;
+}
+.hello {
+  margin-top: 10%;
+}
+@font-face {
+  font-family: malvie;
+  src: url('../fonts/malvie.ttf');
+}
+.fontset {
+  font-family: malvie;
+  font-size: 120%;
 }
 </style>

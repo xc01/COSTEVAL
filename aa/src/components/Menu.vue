@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="whole">
     <el-row>
         <el-col :span="3">
             <el-menu default-active="1" mode="vertical" @select="HandleSelected">
@@ -8,10 +8,12 @@
                 <el-menu-item index="3">分析项目</el-menu-item>
                 <el-menu-item index="4">审计项目</el-menu-item>
             </el-menu>
+            <div class="logout">
+                <el-button @click="handleLogout">退出登录</el-button>
+            </div>
         </el-col>
         <el-col :span="20" :push="1">
             <!-- <router-view></router-view> -->
-            <el-button @click="handleLogout">退出登录</el-button>
             <welcome v-show="selected_index == 1" :usr="usr"></welcome>
             <search-project v-show="selected_index == 2" :uid="uid" @addProjectSuccess="updateList_create" @participateNewProject="updateList_engage"></search-project>
             <project-list v-show="selected_index == 3" :priority="1" :project="project_list_1" ref="pjL1"></project-list>
@@ -124,5 +126,18 @@ export default {
 <style>
 body {
     background-color: #fff;
+}
+.whole {
+    height: 100%;
+}
+.el-row {
+  height: 100%;
+}
+.el-col {
+  height: 100%;
+}
+.el-button {
+    position: relative;
+    margin-top: 200%;
 }
 </style>
