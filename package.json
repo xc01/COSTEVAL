@@ -1,8 +1,0 @@
-{
-  "dependencies": {
-    "element-plus": "^2.2.2",
-    "element-ui": "^2.15.8",
-    "gogocode-plugin-vue": "^1.0.29",
-    "vue": "^3.2.36"
-  }
-}

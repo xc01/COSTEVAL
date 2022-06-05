@@ -1,24 +1,31 @@
 {
+<<<<<<< HEAD
+  "dependencies": {
+    "element-plus": "^2.2.2",
+    "element-ui": "^2.15.8",
+    "gogocode-plugin-vue": "^1.0.29",
+    "vue": "^3.2.36"
+  }
+=======
   "name": "aa",
   "version": "1.0.0",
   "description": "A Vue.js project",
   "author": "MufanLiu <19307130248@fudan.edu.cn>",
   "private": true,
   "scripts": {
-    "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
+    "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js --host 0.0.0.0",
     "start": "npm run dev",
     "unit": "jest --config test/unit/jest.conf.js --coverage",
     "e2e": "node test/e2e/runner.js",
     "test": "npm run unit && npm run e2e",
     "lint": "eslint --ext .js,.vue src test/unit test/e2e/specs",
     "build": "node build/build.js",
-    "serve": "vue-cli-service serve --host 127.0.0.1"
+    "serve": "vue-cli-service serve --host 0.0.0.0"
   },
   "dependencies": {
     "axios": "^0.27.2",
     "element-ui": "^2.15.8",
-    "gogocode-plugin-element": "^0.0.3",
-    "gogocode-plugin-vue": "^1.0.29",
+    "three": "^0.58.10",
     "vue": "^2.5.2",
     "vue-router": "^3.0.1"
   },
@@ -74,6 +81,8 @@
     "vue-jest": "^1.0.2",
     "vue-loader": "^13.3.0",
     "vue-style-loader": "^3.0.1",
+    "sass-loader": "6.0.5",
+    "style-loader": "0.17.0",
     "vue-template-compiler": "^2.5.2",
     "webpack": "^3.6.0",
     "webpack-bundle-analyzer": "^2.9.0",
@@ -89,4 +98,5 @@
     "last 2 versions",
     "not ie <= 8"
   ]
+>>>>>>> 50c05cbfa9010c4ecfaafe8aca2ef82679d1dc47
 }

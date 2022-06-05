@@ -10,26 +10,31 @@ import personView from './components/personView'
 import searchProject from './components/searchProject'
 import estimate from './components/estimate'
 import costDriverAssess from './components/costDriverAssess'
-import ElementUI from 'element-plus'
-import 'element-ui/lib/theme-chalk/index.css' //样式表
+import login from './components/login'
+import ElementUI from 'element-ui'
+import 'element-ui/lib/theme-chalk/index.css'   //样式表
 import axios from 'axios'
 
 Vue.config.productionTip = false
-Vue.component('project-list', projectList) // 注册组件
-Vue.component('welcome', Welcome) // 注册组件
-Vue.component('code-view', codeView) // 注册组件
-Vue.component('person-view', personView) // 注册组件
-Vue.component('search-project', searchProject) // 注册组件
-Vue.component('estimate', estimate) // 注册组件
-Vue.component('cost-driver-assess', costDriverAssess) // 注册组件
+Vue.component('project-list', projectList)  // 注册组件
+Vue.component('welcome', Welcome)  // 注册组件
+Vue.component('code-view', codeView)  // 注册组件
+Vue.component('person-view', personView)  // 注册组件
+Vue.component('search-project', searchProject)  // 注册组件
+Vue.component('estimate', estimate)  // 注册组件
+Vue.component('cost-driver-assess', costDriverAssess)  // 注册组件
+Vue.component('login', login)  // 注册组件
+
+
 
 Vue.use(ElementUI) //使用element-ui
 Vue.prototype.$axios = axios // 全局挂载
+
 
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
   router,
   components: { App },
-  template: '<App/>',
+  template: '<App/>'
 })
