@@ -1,9 +1,9 @@
 <template>
     <div class="login-container" style="background-color: #141a48;margin: 0px;overflow: hidden;">
         <div id="canvascontainer" ref='can'></div>
-
         <div v-if="notRegister">
             <el-form ref="loginForm" autocomplete="on" :model="loginForm" :rules="loginRules"  class="login-form">
+                <img alt="Vue logo" class="element-plus-logo" width="100%" src="../assets/logo.gif" />
                 <el-form-item prop="username">
                     <el-input type="text" v-model="loginForm.username" placeholder="Username" autocomplete="on">
                         <i class="el-icon-user svg-container" slot="prepend"></i>
@@ -328,7 +328,9 @@ export default {
     height: 100vh;
     background-color: #2d3a4b;
 } */
-
+img {
+    margin-left: 10px;
+}
 .login-container a{color:#0078de;}
 
 .login-container input {
@@ -373,7 +375,7 @@ export default {
     position: absolute;
     left: 0;
     right: 0;
-    width: 330px;
+    width: 530px;
     padding: 35px 35px 15px 35px;
     margin: 120px auto;
 }
@@ -385,6 +387,7 @@ export default {
     border-radius: 5px;
     color: #454545;
     width: 330px;
+    margin-left: 100px;
 }
 
 .login-container .el-input-group__prepend {
@@ -414,7 +417,7 @@ export default {
      }
 
 .login-container button {
-    width: 100%;
+    width: 330px;
     height: 36px;
 }
 
