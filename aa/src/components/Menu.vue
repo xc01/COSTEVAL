@@ -4,7 +4,7 @@
         <el-col :span="3">
             <el-menu default-active="1" mode="vertical" @select="HandleSelected">
                 <el-menu-item index="1">欢迎</el-menu-item>
-                <el-menu-item index="2">搜索项目</el-menu-item>
+                <el-menu-item index="2">管理项目</el-menu-item>
                 <el-menu-item index="3">分析项目</el-menu-item>
                 <el-menu-item index="4">审计项目</el-menu-item>
             </el-menu>
@@ -15,9 +15,9 @@
         <el-col :span="20" :push="1">
             <!-- <router-view></router-view> -->
             <welcome v-show="selected_index == 1" :usr="usr"></welcome>
-            <search-project v-show="selected_index == 2" :uid="uid" @addProjectSuccess="updateList_create" @participateNewProject="updateList_engage"></search-project>
-            <project-list v-show="selected_index == 3" :priority="1" :project="project_list_1" ref="pjL1"></project-list>
-            <project-list v-show="selected_index == 4" :priority="0" :project="project_list_0" ref="pjL0"></project-list>
+            <search-project v-show="selected_index == 2" :uid="uid" @addProjectSuccess="updateList_create" @deleteProjectSuccess="updateList_delete" @participateNewProject="updateList_engage" />
+            <project-list v-show="selected_index == 3" :priority="1" :project="project_list_1" ref="pjL1" />
+            <project-list v-show="selected_index == 4" :priority="0" :project="project_list_0" ref="pjL0" />
         </el-col>
     </el-row>
   </div>
@@ -94,6 +94,12 @@ export default {
             this.project_list_1.unshift(data)
         },
 
+        updateList_delete: function(data) { // 在新建项目后，同步更新该界面的数据，将项目插入到其中
+            console.log(data)
+            // project.unshift(data)
+            // this.project_list_1.unshift(data)
+        },
+
         updateList_engage: function(data) { // 在新建项目后，同步更新该界面的数据，将项目插入到其中
             project.unshift(data)
             this.project_list_0.unshift(data)
@@ -136,7 +142,7 @@ body {
 .el-col {
   height: 100%;
 }
-.el-button {
+.logout {
     position: relative;
     margin-top: 200%;
 }
