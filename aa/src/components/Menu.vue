@@ -93,9 +93,18 @@ export default {
             project.unshift(data)
             this.project_list_1.unshift(data)
         },
-
-        updateList_delete: function(data) { // 在新建项目后，同步更新该界面的数据，将项目插入到其中
-            console.log(data)
+        delete_pid: function(pj, pid) {
+            pj.some((item, i) => {
+                console.log(item, i)
+                if (item.pid == pid) {
+                    pj.splice(i, 1)
+                    return true;
+                }
+            })
+        },
+        updateList_delete: function(pid) { // 在新建项目后，同步更新该界面的数据，将项目插入到其中
+            this.delete_pid(project, pid)
+            this.delete_pid(this.project_list_1, pid)
             // project.unshift(data)
             // this.project_list_1.unshift(data)
         },
@@ -134,13 +143,13 @@ body {
     background-color: #fff;
 }
 .whole {
-    height: 100%;
+    height: 80%;
 }
 .el-row {
-  height: 100%;
+  height: 80%;
 }
 .el-col {
-  height: 100%;
+  height: 80%;
 }
 .logout {
     position: relative;

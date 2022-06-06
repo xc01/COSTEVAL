@@ -173,7 +173,7 @@ export default {
                 type: 'warning'
             }).then(() => { // 验证成功
                 this.delete_pid(pid);
-                // this.$emit('deleteProjectSuccess', new_project) // 触发事件 addProjectSuccess, 以便父组件添加到列表
+                this.$emit('deleteProjectSuccess', pid) // 触发事件 addProjectSuccess, 以便父组件添加到列表
                 this.$message.success("删除项目成功！")
                 this.List = this.getfakelist();
                 // this.$axios.get('url', params).then(function(res){
@@ -197,7 +197,7 @@ export default {
 <style>
     .unsearched {
         position: absolute;
-        top:30%;
+        top:90%;
         left:30%;
     }
     .searched {

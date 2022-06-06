@@ -13,7 +13,7 @@ export default {
 <style>
 :root,
 body {
-  height: 100%;
+  height: 80%;
 }
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
