@@ -13,7 +13,7 @@ import costDriverAssess from './components/costDriverAssess'
 import login from './components/login'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'   //样式表
-import axios from 'axios'
+import axios, { Axios } from 'axios'
 
 Vue.config.productionTip = false
 Vue.component('project-list', projectList)  // 注册组件
@@ -29,7 +29,7 @@ Vue.component('login', login)  // 注册组件
 
 Vue.use(ElementUI) //使用element-ui
 Vue.prototype.$axios = axios // 全局挂载
-
+axios.defaults.baseURL = '/apis'
 
 /* eslint-disable no-new */
 new Vue({

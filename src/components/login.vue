@@ -10,7 +10,7 @@
                     </el-input>
                 </el-form-item>
                 <el-form-item prop="password">
-                    <el-input type="password" v-model="loginForm.password" placeholder="Password" @keyup.enter.native="handleLogin">
+                    <el-input type="password" v-model="loginForm.password" placeholder="Password" @keyup.enter.native="handleLogin" show-password>
                         <i class="el-icon-lock svg-container" slot="prepend"></i>
                     </el-input>
                 </el-form-item>
@@ -89,7 +89,7 @@ export default {
         };
         return {
             loginForm: { // 登录表单
-                username: 'Admin',
+                username: '',
                 password: ''
             },
             loginRules: {  // 登录验证规则
@@ -172,44 +172,44 @@ export default {
             this.$refs.loginForm.validate(valid => {
                 if (valid) {
                     // test
-                    localStorage.setItem('username', this.loginForm.username);
-                    localStorage.setItem('login', "1");
-                    this.$message.success('登录成功');
-                    this.$router.replace('/'); // 跳转路径
-                    this.timer = setTimeout(() => { // 设置计时器 2s 后登录失效
-                        var l = localStorage.getItem("login");
-                        if (l == null || l != "0") {
-                            localStorage.setItem("login", "0");
-                            this.$message.info("到时间啦");
-                            var evt = document.createEvent('CloseEvent'); // 创建事件
-                            evt.initEvent("logout", false, false);  // 初始化事件为 logout
-                            document.dispatchEvent(evt);  // 触发事件，Menu 监听
-                        }
-                    }, 60000);
+                    // localStorage.setItem('username', this.loginForm.username);
+                    // localStorage.setItem('login', "1");
+                    // this.$message.success('登录成功');
+                    // this.$router.replace('/'); // 跳转路径
+                    // this.timer = setTimeout(() => { // 设置计时器 2s 后登录失效
+                    //     var l = localStorage.getItem("login");
+                    //     if (l == null || l != "0") {
+                    //         localStorage.setItem("login", "0");
+                    //         this.$message.info("到时间啦");
+                    //         var evt = document.createEvent('CloseEvent'); // 创建事件
+                    //         evt.initEvent("logout", false, false);  // 初始化事件为 logout
+                    //         document.dispatchEvent(evt);  // 触发事件，Menu 监听
+                    //     }
+                    // }, 60000);
                     
-                    // this.loading = true;
-                    // var that = this;
-                    // this.$axios.post('http://139.196.225.67:8008/login', this.loginForm).then((res) => {
-                    //     console.log(res)
-                    //     that.loading = false;
-                    //     // localStorage.setItem('username', this.loginForm.username); // 加入本地储存
-                    //        localStorage.setItem('login', "1");  // 设置登录状态
-                    //     that.$message.success('登录成功');
-                    //     that.$router.replace('/'); // 跳转路径
-                        // this.timer = setTimeout(() => { // 设置计时器 2s 后登录失效
-                        //     var l = localStorage.getItem("login");
-                        //     if (l == null || l != "0") {
-                        //         localStorage.setItem("login", "0");
-                        //         this.$message.info("到时间啦");
-                        //         var evt = document.createEvent('CloseEvent'); // 创建事件
-                        //         evt.initEvent("logout", false, false);  // 初始化事件为 logout
-                        //         document.dispatchEvent(evt);  // 触发事件，Menu 监听
-                        //     }
-                        // }, 2000);
-                    // }).catch(err => {
-                    //     this.$message.error(err);
-                    //     this.loading = false;
-                    // });
+                    this.loading = true;
+                    var that = this;
+                    this.$axios({method:'get', url:'login', data:this.loginForm}).then((res) => {
+                        console.log(res)
+                        that.loading = false;
+                        // localStorage.setItem('username', this.loginForm.username); // 加入本地储存
+                        localStorage.setItem('login', "1");  // 设置登录状态
+                        that.$message.success('登录成功');
+                        that.$router.replace('/'); // 跳转路径
+                        this.timer = setTimeout(() => { // 设置计时器 2s 后登录失效
+                            var l = localStorage.getItem("login");
+                            if (l == null || l != "0") {
+                                localStorage.setItem("login", "0");
+                                this.$message.info("到时间啦");
+                                var evt = document.createEvent('CloseEvent'); // 创建事件
+                                evt.initEvent("logout", false, false);  // 初始化事件为 logout
+                                document.dispatchEvent(evt);  // 触发事件，Menu 监听
+                            }
+                        }, 2000);
+                    }).catch(err => {
+                        this.$message.error(err);
+                        this.loading = false;
+                    });
                 } else {
                     this.$message.error('error submit!!');
                     return false;

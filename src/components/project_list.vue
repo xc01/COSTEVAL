@@ -1,10 +1,6 @@
 <template>
   <div class="hello">
     <div v-if="!entered">
-      <el-input placeholder="请输入项目名称" v-model="keyword" class="input-with-select" @keyup.enter.native="search">
-        <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
-      </el-input>
-
       <p>您可以{{ priority==1 ? "分析": "审计" }}的项目有：</p>
       <ul>
         <li v-show="project.length">
@@ -12,22 +8,26 @@
           <span>管理</span>
         </li>
         <li v-for="(pj, index) in searchedProjectList" :key="(pj, index)">
-          <span>{{ pj.name }}</span>
-          <el-button @click="get_code(pj.pid)">查看详情</el-button>
-          <el-button v-if="priority" @click="check_persons(pj.pid)">查看相关人员</el-button>
-          <el-upload
-            class="unknow"
-            action="#"
-            :on-success="uploadSuccess"
-            :on-error="uploadProcess"
-            :on-progress="uploadFail"
-            multiple>
-            <el-button size="small" type="primary">上传项目</el-button>
-            <div slot="tip" class="el-upload__tip">请上传项目压缩包为文件</div>
-          </el-upload>
-          <!-- <el-button size="small" type="primary" @click="begin_export(pj.pid)">导出项目</el-button> -->
-          <el-link href="#" download="">导出</el-link>
-          <el-button v-if="priority" @click="estimate(pj.pid)">分析</el-button>
+          <el-card class="box-card">
+            <div slot="header" class="clearfix">
+              <span>{{ pj.name }}</span>
+              <el-button style="float: right; padding: 3px 0" type="text" @click="get_code(pj.pid)">查看详情</el-button>
+            </div>
+            <el-button v-if="priority" @click="check_persons(pj.pid)">查看相关人员</el-button>
+            <el-upload
+              class="unknow"
+              action="#"
+              :on-success="uploadSuccess"
+              :on-error="uploadProcess"
+              :on-progress="uploadFail"
+              multiple>
+              <el-button size="small" type="primary">上传项目</el-button>
+              <div slot="tip" class="el-upload__tip">请上传项目压缩包为文件</div>
+            </el-upload>
+            <!-- <el-button size="small" type="primary" @click="begin_export(pj.pid)">导出项目</el-button> -->
+            <el-link href="#" download="">导出</el-link>
+            <el-button v-if="priority" @click="estimate(pj.pid)">分析</el-button>
+          </el-card>
         </li>
       </ul>
     </div>
@@ -136,5 +136,24 @@ export default { // projectList 组件
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+  .text {
+    font-size: 14px;
+  }
 
+  .item {
+    margin-bottom: 18px;
+  }
+
+  .clearfix:before,
+  .clearfix:after {
+    display: table;
+    content: "";
+  }
+  .clearfix:after {
+    clear: both
+  }
+
+  .box-card {
+    width: 480px;
+  }
 </style>
