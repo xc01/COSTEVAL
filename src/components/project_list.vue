@@ -2,13 +2,10 @@
   <div class="hello">
     <div v-if="!entered">
       <p>您可以{{ priority==1 ? "分析": "审计" }}的项目有：</p>
-      <ul>
-        <li v-show="project.length">
-          <span>项目名称</span>
-          <span>管理</span>
-        </li>
-        <li v-for="(pj, index) in searchedProjectList" :key="(pj, index)">
-          <el-card class="box-card">
+      <el-row :type="flex" :justify="space-around" class="row-con">
+        <el-col :span="9" :push="2" v-for="(pj, index) in searchedProjectList"
+        :key="(pj, index)" :offset="index === 0 ? 0 : (index%2 === 0 ? '0' : '1')" style="margin-bottom:25px;'">
+          <el-card class="box-card" shadow="hover">
             <div slot="header" class="clearfix">
               <span>{{ pj.name }}</span>
               <el-button style="float: right; padding: 3px 0" type="text" @click="get_code(pj.pid)">查看详情</el-button>
@@ -28,8 +25,8 @@
             <el-link href="#" download="">导出</el-link>
             <el-button v-if="priority" @click="estimate(pj.pid)">分析</el-button>
           </el-card>
-        </li>
-      </ul>
+        </el-col>
+      </el-row>
     </div>
     <!-- 路径的视图 -->
     <router-view v-if="entered" @back="reset"></router-view>
@@ -136,6 +133,9 @@ export default { // projectList 组件
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+  li {
+    list-style:none;
+  }
   .text {
     font-size: 14px;
   }
@@ -155,5 +155,25 @@ export default { // projectList 组件
 
   .box-card {
     width: 480px;
+  }
+
+  .el-card {
+    margin: 20px 20px 20px 20px;
+  }
+
+  .el-row {
+    margin-bottom: 20px;
+  }
+
+  .el-col {
+    border-radius: 4px;
+  }
+
+  .row-con {
+    display: flex;
+    flex-flow: row wrap;
+  }
+  .row-con .box-card {
+    height: 100%;
   }
 </style>

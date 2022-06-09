@@ -26,13 +26,18 @@
                         <i class="el-icon-user svg-container" slot="prepend"></i>
                     </el-input>
                 </el-form-item>
+                <el-form-item prop="email">
+                    <el-input type="text" v-model="registerForm.email" placeholder="Email" autocomplete="on">
+                        <i class="el-icon-message svg-container" slot="prepend"></i>
+                    </el-input>
+                </el-form-item>
                 <el-form-item prop="registerpassword">
-                    <el-input type="password" v-model="registerForm.registerpassword" placeholder="Password">
+                    <el-input type="password" v-model="registerForm.registerpassword" placeholder="Password" show-password>
                         <i class="el-icon-lock svg-container" slot="prepend"></i>
                     </el-input>
                 </el-form-item>
                 <el-form-item prop="repeatpassword">
-                    <el-input type="password" v-model="registerForm.repeatpassword" placeholder="repeat password" @keyup.enter.native="handleRegister">
+                    <el-input type="password" v-model="registerForm.repeatpassword" placeholder="repeat password" show-password @keyup.enter.native="handleRegister">
                         <i class="el-icon-lock svg-container" slot="prepend"></i>
                     </el-input>
                 </el-form-item>
@@ -47,41 +52,55 @@
 <script>
 // npm i three@0.058 --save
 import * as THREE from "three";
+import qs from 'Qs'
 
 function isWscnEmail(str) {
-    const reg = /^[a-z0-9](?:[-_.+]?[a-z0-9]+)*@wz\.com$/i;
+    const reg = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
+    return reg.test(str.trim());
+}
+
+function strongpwd(str) {
+    const reg = /^(?=.*\d)(?=.*[a-zA-Z])(?=.*[^a-zA-Z0-9]).{8,30}$/
     return reg.test(str.trim());
 }
 
 export default {
     name: 'login',
     data() {
+        const validateUsername = (rule, value, callback) => { // 验证用户名
+            if (value.length < 1) {
+                callback(new Error('请输入用户名'));
+            } else {
+                callback();
+            }
+        };
         const validateEmail = (rule, value, callback) => { // 验证用户名
-            // if (!isWscnEmail(value)) {
-            //     callback(new Error('请输入正确的合法邮箱'));
-            // } else {
-            //     callback();
-            // }
-            callback();
+            if (!isWscnEmail(value)) {
+                callback(new Error('请输入正确的合法邮箱'));
+            } else {
+                callback();
+            }
         };
         const validatePass = (rule, value, callback) => { // 验证输入密码
-            if (value.length < 6) {
-                callback(new Error('密码不能小于6位'));
+            if (value.length < 8) {
+                callback(new Error('密码不能小于8位'));
             } else {
                 callback();
             }
         };
         const validateRegisterPass = (rule, value, callback) => { // 验证注册密码
-            if (value.length < 6) {
-                callback(new Error('密码不能小于6位'));
-            } else if (value != this.registerForm.repassword) {
-                callback(new Error('输入的密码必须一致'));
+            if (value.length < 8) {
+                callback(new Error('密码不能小于8位'));
+            } else if (value.length > 30) {
+                callback(new Error('密码不能多于30位'));
+            } else if (!strongpwd(value)) {
+                callback(new Error('密码中必须包含字母、数字、特称字符'));
             } else {
                 callback();
             }
         };
         const validateRepeatPass = (rule, value, callback) => { // 验证注册重复的密码
-            if (value != this.registerForm.password) {
+            if (value != this.registerForm.registerpassword) {
                 callback(new Error('输入的密码必须一致'));
             } else {
                 callback();
@@ -94,7 +113,7 @@ export default {
             },
             loginRules: {  // 登录验证规则
                 username: [
-                    { required: true, trigger: 'blur', validator: validateEmail }
+                    { required: true, trigger: 'blur', validator: validateUsername }
                 ],
                 password: [
                     { required: true, trigger: 'blur', validator: validatePass }
@@ -102,11 +121,15 @@ export default {
             },
             registerForm: { // 注册表单
                 username: '',
+                email: '',
                 registerpassword: '',
                 repeatpassword: ''
             },
             registerRules: { // 注册验证规则，规则名必须和数据名相同，不让会有奇怪的 bug
                 username: [
+                    { required: true, trigger: 'blur', validator: validateUsername }
+                ],
+                email: [
                     { required: true, trigger: 'blur', validator: validateEmail }
                 ],
                 registerpassword: [
@@ -169,7 +192,7 @@ export default {
 
     methods: {
         handleLogin() { // 登录处理
-            this.$refs.loginForm.validate(valid => {
+            this.$refs.loginForm.validate((valid, $validation) => {
                 if (valid) {
                     // test
                     // localStorage.setItem('username', this.loginForm.username);
@@ -189,7 +212,10 @@ export default {
                     
                     this.loading = true;
                     var that = this;
-                    this.$axios({method:'get', url:'login', data:this.loginForm}).then((res) => {
+                    this.$axios.post('http://139.196.225.67:8008/login/', qs.stringify({
+                        username: this.loginForm.username,
+                        password: this.loginForm.password
+                    })).then((res) => {
                         console.log(res)
                         that.loading = false;
                         // localStorage.setItem('username', this.loginForm.username); // 加入本地储存
@@ -205,26 +231,38 @@ export default {
                                 evt.initEvent("logout", false, false);  // 初始化事件为 logout
                                 document.dispatchEvent(evt);  // 触发事件，Menu 监听
                             }
-                        }, 2000);
+                        }, 600000);
                     }).catch(err => {
-                        this.$message.error(err);
+                        if (err.response.status == 500) {
+                            this.$message.error("用户名或密码错误！");   
+                        } else {
+                            this.$message.error(err);
+                        }
                         this.loading = false;
                     });
                 } else {
-                    this.$message.error('error submit!!');
+                    this.$message.error($validation.hasOwnProperty('username') ? $validation.username[0] : $validation.password[0]);
                     return false;
                 }
             });
         },
 
         handleRegister() { // 注册处理
-            this.$refs.registerForm.validate(valid => {
+            this.$refs.registerForm.validate((valid, $validation) => {
                 if (valid) {
                     this.loading = true;
                     var that = this;
-                    this.$axios.post('http://139.196.225.67:8008/register', this.registerForm).then((res) => {
-                        that.$message.success('注册成功');
+                    this.$axios.post('http://139.196.225.67:8008/insert_user/', qs.stringify({
+                        username: this.registerForm.username,
+                        email: this.registerForm.email,
+                        password: this.registerForm.registerpassword
+                    })).then((res) => {
                         console.log(res)
+                        if (res.data.substring(0, 11) != 'Sucessfully') {
+                            this.$message.error(res.data);
+                            return false;
+                        }
+                        that.$message.success('注册成功');
                         
                         that.loading = false;
                         // localStorage.setItem('username', this.loginForm.username); // 加入本地储存
@@ -236,7 +274,7 @@ export default {
                         this.loading = false;
                     });
                 } else {
-                    this.$message.error('error submit!!');
+                    this.$message.error($validation.hasOwnProperty('username') ? $validation.username[0] : $validation.hasOwnProperty('registerpassword') ? $validation.registerpassword[0] : $validation.hasOwnProperty('repeatpassword') ? $validation.repeatpassword[0] : $validation.email[0]);
                     return false;
                 }
             });
@@ -399,8 +437,8 @@ img {
 }
 
 #canvascontainer{
-  position: absolute;
-  top: 0px;
+    position: absolute;
+    top: 0px;
 }
 
 .wz-input-group-prepend{
