@@ -14,7 +14,7 @@
                 </el-col>
             </el-row>
         </div>
-        <el-table v-show="searched"
+        <el-table class="searched" v-show="searched"
             :data="List"
             style="width: 100%">
             <el-table-column label="项目名称" prop="name" />
@@ -28,7 +28,6 @@
                 </template>
                 <template slot-scope="scope">
                     <el-button size="mini" @click="addToProject(scope.row)">加入</el-button>
-                    <el-button size="mini" type="danger" @click="deleteProject(scope.row.id)">删除</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -211,10 +210,10 @@ export default {
     img {
         margin-left: -10%;
     }
-    .searched {
-        margin-left:-10%;
+    .unsearched {
+        margin-top: 8%;
     }
     .whole {
-        height: 100%;
+        width: 95%;
     }
 </style>

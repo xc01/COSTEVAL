@@ -362,10 +362,10 @@ export default {
 </script>
 
 <style>
-/* .login-container {
-    height: 100vh;
+.login-container {
+    height: 100%;
     background-color: #2d3a4b;
-} */
+}
 img {
     margin-left: 10px;
 }

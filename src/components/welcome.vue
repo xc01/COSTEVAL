@@ -4,7 +4,7 @@
     <div class="fontset">
       <h1 >Hello! {{ usr }}</h1>
     </div>
-    <a href="https://www.baidu.com">指引，如何操作</a>
+    <a href="https://www.baidu.com">点击查看操作引导</a>
   </div>
 </template>
 
@@ -40,8 +40,7 @@ a {
   color: #42b983;
 }
 .hello {
-  margin-top: 10%;
-  margin-left: -10%;
+  margin-top: 8%;
 }
 @font-face {
   font-family: malvie;

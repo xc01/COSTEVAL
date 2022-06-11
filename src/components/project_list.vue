@@ -3,14 +3,26 @@
     <div v-if="!entered">
       <p>您可以{{ priority==1 ? "分析": "审计" }}的项目有：</p>
       <el-row class="row-con">
-        <el-col :span="9" :push="2" v-for="(pj, index) in searchedProjectList"
-        :key="(pj, index)" style="margin-bottom:25px;'">
-          <el-card class="box-card" shadow="hover">
+        <el-col :span="7" v-for="(pj, index) in getList(searchedProjectList, tablePage.pageNum, tablePage.pageSize)"
+        :key="index" style="margin-bottom:25px;'" :offset="index == 0 ? 0 : 1">
+          <el-card class="box-card" shadow="hover" body-style="height:'0px'">
             <div slot="header" class="clearfix">
-              <span>{{ pj.name }}</span>
-              <el-button style="float: right; padding: 3px 0" type="text" @click="get_code(pj.pid)">查看详情</el-button>
+              <el-col :md="24" :lg="15" :offset="0"><span>{{ pj.name }}</span> </el-col>
+              <el-col :md="24" :lg="8" :offset="1">
+              <el-popconfirm  v-if="priority"
+                confirm-button-text='查看任务详情'
+                cancel-button-text='查看相关人员'
+                icon="el-icon-info"
+                icon-color="green"
+                title="请选择需要查看的对象" 
+                @confirm="get_code(pj.pid)"
+                @cancel="check_persons(pj.pid)"
+              >
+              <el-button slot='reference' style="float: right; padding: 3px 0" type="text">查看详情</el-button>
+              </el-popconfirm>
+              <el-button v-else slot='reference' style="float: right; padding: 3px 0" type="text" @click="get_code(pj.pid)">查看任务详情</el-button>
+              </el-col>
             </div>
-            <el-button v-if="priority" @click="check_persons(pj.pid)">查看相关人员</el-button>
             <el-upload
               class="unknow"
               action="#"
@@ -18,15 +30,25 @@
               :on-error="uploadProcess"
               :on-progress="uploadFail"
               multiple>
-              <el-button size="small" type="primary">上传项目</el-button>
+              <el-button size="big" type="primary" class="loadbutton">上传项目</el-button>
               <div slot="tip" class="el-upload__tip">请上传项目压缩包为文件</div>
             </el-upload>
             <!-- <el-button size="small" type="primary" @click="begin_export(pj.pid)">导出项目</el-button> -->
-            <el-link href="#" download="">导出</el-link>
-            <el-button v-if="priority" @click="estimate(pj.pid)">分析</el-button>
+            <div class="row-foot">
+              <el-link href="#" download="" style="margin-right: 5px">导出</el-link>
+              <el-button v-if="priority" @click="estimate(pj.pid)">分析</el-button>
+            </div>
           </el-card>
         </el-col>
       </el-row>
+      <el-pagination
+        :current-page="tablePage.pageNum"
+        :page-size="tablePage.pageSize"
+        :total="tablePage.total"
+        :hide-on-single-page=false
+        layout="total, prev, pager, next"
+        @current-change="handlePageChange">
+      </el-pagination>
     </div>
     <!-- 路径的视图 -->
     <router-view v-if="entered" @back="reset"></router-view>
@@ -51,6 +73,11 @@ export default { // projectList 组件
 
   data () {
     return {
+      tablePage: {
+        pageNum: 1, // 第几页
+        pageSize: 3, // 每页多少条
+        total: this.project.length // 总记录数
+      },
       keyword: "", // 搜索关键词
       searchedProjectList: this.project, // 搜索到的结果
       entered: false
@@ -97,6 +124,7 @@ export default { // projectList 组件
     search: function() { // 搜索
       if (this.keyword == '') {
             this.searchedProjectList = this.project;
+            this.tablePage.total = this.project.length;
             return;
         }
         var result = [];
@@ -120,6 +148,25 @@ export default { // projectList 组件
     reset: function() {
       this.entered = false;
       this.$router.push('/');
+    },
+    
+    handlePageChange(currentPage) {
+      this.tablePage.pageNum = currentPage
+      // 在此刷新数据
+    },
+    getList(data, num, size) {
+      console.log(data, num, size)
+      let list, total, start, end, isFirst, isLast
+      total = data.length
+      isFirst = total < size
+      isLast = Math.ceil(total / size) === num
+      start = (num - 1) * size
+      end = isFirst || isLast ? start + (total % size) : start + size
+      list = data.slice(start, end)
+      list.forEach((item, index) => {
+        item.seq = index + start
+      })
+      return list
     }
   },
 
@@ -153,14 +200,6 @@ export default { // projectList 组件
     clear: both
   }
 
-  .box-card {
-    width: 480px;
-  }
-
-  .el-card {
-    margin: 20px 20px 20px 20px;
-  }
-
   .el-row {
     margin-bottom: 20px;
   }
@@ -174,6 +213,22 @@ export default { // projectList 组件
     flex-flow: row wrap;
   }
   .row-con .box-card {
-    height: 100%;
+    height: 110%;
+  }
+
+  .clearfix span {
+    margin-left: -80%;
+    font: 18px bold;
+  }
+  .hello p {
+    font: 20px bold;
+  }
+  .row-foot {
+    position: absolute;
+    margin-top: 2%;
+    margin-left: 14%;
+  }
+  .loadbutton {
+    margin-top: 8px;
   }
 </style>

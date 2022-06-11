@@ -1,30 +1,30 @@
 <template>
   <div class="whole">
-    <el-row :gutter="20">
-        <el-col :md="24" :lg="7">
+    <el-row>
+        <el-col :md="24" :lg="5" :offset="1">
             <el-card class="box-card">
                 <div class="user-info">
-                    <el-avatar :size="104" :src="src" :fit="scale-down"/>
-                    <div class="usernameStyle"> Welcome! </div>
+                    <el-avatar :size="104" :src="src" fit="scale-down"/>
+                    <div class="usernameStyle"> 用户ID </div>
                     <div class="labelStyle"> {{usr}} </div>
                 </div>
                 <el-divider />
-                <div class="userTagStyle">
-                    <div class="clearfix">
+                <div class="clearfix">
+                    <div class="usernameStyle">
                         <span>用户标签</span>
                     </div>
                     <div class="userTagDetailStyle">
-                        <el-tag :key="tag" v-for="tag in dynamicTags"
+                        <el-tag :key="index" v-for="(tag, index) in dynamicTags"
                         :disable-transitions="false" @close="handleClose(tag)" closable>
                             {{tag}}
                         </el-tag>
                         <el-input
-                        class="input-new-tag" v-if="inputVisible" v-model="inputvalue" ref="saveTagInput" size="small"
+                        class="input-new-tag" v-if="inputVisible" v-model="inputvalue" ref="saveTagInput" size="small" resize="vertical"
                         @keyup.enter.native="handleInputConfirm" @blur="handleInputConfirm"
                         >
                         </el-input>
                         <el-button v-else
-                        class="button-new-tag" size=" small"
+                        class="button-new-tag" size="mini"
                         @click="showInput" icon="el-icon-plus" />
                     </div>
                 </div>
@@ -34,8 +34,9 @@
                 </div>
             </el-card>
         </el-col>
-        <el-col :md="24" :lg="17">
-            <el-tabs class="tabStyle" value="first">
+        <el-col :md="24" :lg="16" :offset="1">
+        <el-card class="tabStyle">
+            <el-tabs>
                 <el-tab-pane label="欢迎" index="1" style="width: 100%; padding: 24px ">
                     <welcome :usr="usr"></welcome>
                 </el-tab-pane>
@@ -49,6 +50,7 @@
                     <project-list :priority="0" :project="project_list_0" ref="pjL0" />
                 </el-tab-pane>
             </el-tabs>
+            </el-card>
         </el-col>
 
         <!-- <el-col :span="3">
@@ -74,11 +76,13 @@
 
 <script>
 
-var pj1 = {name: 'pj1', pid: 1, authrity: 0}
-var pj2 = {name: 'pj2', pid: 2, authrity: 1}
-var pj3 = {name: 'pj3', pid: 3, authrity: 1}
-var pj4 = {name: 'pj4', pid: 4, authrity: 0}
-var project = [pj1, pj2, pj3, pj4]
+var project =  [{name: 'pj1', pid: 1, authrity: 1},
+                {name: 'pj2', pid: 2, authrity: 1},
+                {name: 'pj3', pid: 3, authrity: 1},
+                {name: 'pj4', pid: 4, authrity: 0},
+                {name: 'pj5', pid: 5, authrity: 1},
+                {name: 'pj6', pid: 6, authrity: 1},
+                {name: 'pj7', pid: 7, authrity: 0}]
 
 export default {
     name: "Menu",
@@ -99,7 +103,6 @@ export default {
             else
                 project_list_1.push(project[i])
         }
-
         var login = localStorage.getItem("login"); // 获取登录状态
         if (login != "1") {
             login = false;
@@ -190,11 +193,12 @@ export default {
         handleInputConfirm: function() {
             this.dynamicTags.push(this.inputvalue)
             this.inputVisible = false
+            this.inputvalue = ''
         }
     },
 
     mounted () {
-        document.getElementsByTagName("body")[0].style.backgroundColor = "#fff";
+        document.getElementsByTagName("body")[0].style.backgroundColor = "rgb(198, 213, 241)";
         
         if (!this.login) {
             this.$router.replace('/login');  // 如果没有登录，则到登录页面
@@ -216,17 +220,41 @@ export default {
 }
 </script>
 
-<style scoped>
-body {
-    background: rgb(198, 213, 241);
+<style>
+.whole { 
+    height: 100%; 
 }
-.whole {
-    height: 80%;
+.whole .el-row { 
+    height: 100%; 
+    display: flex; 
+    flex-wrap: wrap; 
 }
-.el-row {
-  height: 80%;
+.whole .el-row.el-col { 
+    height: 100%; 
+} 
+
+.box-card {
+    margin-top: 10%;
 }
-.el-col {
-  height: 80%;
+
+.box-card .user-info .el-avatar {
+    margin: 15px;
+}
+
+.box-card {
+    margin-top: 10%;
+}
+
+.usernameStyle {
+    margin: 10px;
+    font-size: 18px;
+}
+
+.tabStyle {
+    height: 550px;
+}
+
+.input-new-tag {
+    width: 70px;
 }
 </style>
