@@ -220,6 +220,7 @@ export default {
                         that.loading = false;
                         // localStorage.setItem('username', this.loginForm.username); // 加入本地储存
                         localStorage.setItem('login', "1");  // 设置登录状态
+                        localStorage.setItem('username', this.loginForm.username); // 加入本地储存
                         that.$message.success('登录成功');
                         that.$router.replace('/'); // 跳转路径
                         this.timer = setTimeout(() => { // 设置计时器 2s 后登录失效
@@ -265,7 +266,6 @@ export default {
                         that.$message.success('注册成功');
                         
                         that.loading = false;
-                        // localStorage.setItem('username', this.loginForm.username); // 加入本地储存
                         
                         // that.$router.replace('/');
                         that.notRegister = true; // 回到登录

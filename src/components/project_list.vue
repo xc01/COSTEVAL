@@ -2,9 +2,9 @@
   <div class="hello">
     <div v-if="!entered">
       <p>您可以{{ priority==1 ? "分析": "审计" }}的项目有：</p>
-      <el-row :type="flex" :justify="space-around" class="row-con">
+      <el-row class="row-con">
         <el-col :span="9" :push="2" v-for="(pj, index) in searchedProjectList"
-        :key="(pj, index)" :offset="index === 0 ? 0 : (index%2 === 0 ? '0' : '1')" style="margin-bottom:25px;'">
+        :key="(pj, index)" style="margin-bottom:25px;'">
           <el-card class="box-card" shadow="hover">
             <div slot="header" class="clearfix">
               <span>{{ pj.name }}</span>

@@ -1,7 +1,57 @@
 <template>
   <div class="whole">
-    <el-row>
-        <el-col :span="3">
+    <el-row :gutter="20">
+        <el-col :md="24" :lg="7">
+            <el-card class="box-card">
+                <div class="user-info">
+                    <el-avatar :size="104" :src="src" :fit="scale-down"/>
+                    <div class="usernameStyle"> Welcome! </div>
+                    <div class="labelStyle"> {{usr}} </div>
+                </div>
+                <el-divider />
+                <div class="userTagStyle">
+                    <div class="clearfix">
+                        <span>用户标签</span>
+                    </div>
+                    <div class="userTagDetailStyle">
+                        <el-tag :key="tag" v-for="tag in dynamicTags"
+                        :disable-transitions="false" @close="handleClose(tag)" closable>
+                            {{tag}}
+                        </el-tag>
+                        <el-input
+                        class="input-new-tag" v-if="inputVisible" v-model="inputvalue" ref="saveTagInput" size="small"
+                        @keyup.enter.native="handleInputConfirm" @blur="handleInputConfirm"
+                        >
+                        </el-input>
+                        <el-button v-else
+                        class="button-new-tag" size=" small"
+                        @click="showInput" icon="el-icon-plus" />
+                    </div>
+                </div>
+                <el-divider />
+                <div class="logout">
+                    <el-button @click="handleLogout">退出登录</el-button>
+                </div>
+            </el-card>
+        </el-col>
+        <el-col :md="24" :lg="17">
+            <el-tabs class="tabStyle" value="first">
+                <el-tab-pane label="欢迎" index="1" style="width: 100%; padding: 24px ">
+                    <welcome :usr="usr"></welcome>
+                </el-tab-pane>
+                <el-tab-pane label="管理项目" index="2" style="width: 100%; padding: 24px ">
+                    <search-project :uid="uid" @addProjectSuccess="updateList_create" @deleteProjectSuccess="updateList_delete" @participateNewProject="updateList_engage" />
+                </el-tab-pane>
+                <el-tab-pane label="分析项目" index="3" style="width: 100%; padding: 24px ">
+                    <project-list :priority="1" :project="project_list_1" ref="pjL1" />
+                </el-tab-pane>
+                <el-tab-pane label="审计项目" index="4" style="width: 100%; padding: 24px ">
+                    <project-list :priority="0" :project="project_list_0" ref="pjL0" />
+                </el-tab-pane>
+            </el-tabs>
+        </el-col>
+
+        <!-- <el-col :span="3">
             <el-menu default-active="1" mode="vertical" @select="HandleSelected">
                 <el-menu-item index="1">欢迎</el-menu-item>
                 <el-menu-item index="2">管理项目</el-menu-item>
@@ -13,12 +63,11 @@
             </div>
         </el-col>
         <el-col :span="20" :push="1">
-            <!-- <router-view></router-view> -->
             <welcome v-show="selected_index == 1" :usr="usr"></welcome>
             <search-project v-show="selected_index == 2" :uid="uid" @addProjectSuccess="updateList_create" @deleteProjectSuccess="updateList_delete" @participateNewProject="updateList_engage" />
             <project-list v-show="selected_index == 3" :priority="1" :project="project_list_1" ref="pjL1" />
             <project-list v-show="selected_index == 4" :priority="0" :project="project_list_0" ref="pjL0" />
-        </el-col>
+        </el-col> -->
     </el-row>
   </div>
 </template>
@@ -62,17 +111,25 @@ export default {
             selected_index: 1,
             usr: localStorage.getItem("username"),
             uid: 0,
+            dynamicTags: ["新人审计师"],
+            src: "https://api.ixiaowai.cn/gqapi/gqapi.php",
             exportPath: null, // 导出到的文件夹
             project_list_0: project_list_0,
             project_list_1: project_list_1,
-            login: login
+            login: login,
+            inputVisible: false,
+            inputvalue: ""
         }
     },
     methods: {
         handleLogout: function() { // 登出
-            localStorage.clear(); // 清空缓存
-            localStorage.setItem("login", "0");
-            this.login = false;
+            this.$axios.get('http://139.196.225.67:8008/logout/').then(function(res){
+                localStorage.clear(); // 清空缓存
+                localStorage.setItem("login", "0");
+                this.login = false;
+            }, function(err) {
+                that.$message.error("登出请求失败, 状态码:" + err.status)
+            });
         },
 
         HandleSelected: function(id) {
@@ -112,6 +169,27 @@ export default {
         updateList_engage: function(data) { // 在新建项目后，同步更新该界面的数据，将项目插入到其中
             project.unshift(data)
             this.project_list_0.unshift(data)
+        },
+
+        delete_tag: function(tag) {
+            this.dynamicTags.some((item, i) => {
+                if (item == tag) {
+                    this.dynamicTags.splice(i, 1)
+                    return true;
+                }
+            })
+        },
+        handleClose: function(tag) {
+            this.delete_tag(tag)
+        },
+
+        showInput: function() {
+            this.inputVisible = true
+        },
+
+        handleInputConfirm: function() {
+            this.dynamicTags.push(this.inputvalue)
+            this.inputVisible = false
         }
     },
 
@@ -138,9 +216,9 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 body {
-    background-color: #fff;
+    background: rgb(198, 213, 241);
 }
 .whole {
     height: 80%;
@@ -150,9 +228,5 @@ body {
 }
 .el-col {
   height: 80%;
-}
-.logout {
-    position: relative;
-    margin-top: 200%;
 }
 </style>

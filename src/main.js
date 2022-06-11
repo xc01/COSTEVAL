@@ -29,6 +29,7 @@ Vue.component('login', login)  // 注册组件
 
 Vue.use(ElementUI) //使用element-ui
 Vue.prototype.$axios = axios // 全局挂载
+axios.defaults.withCredentials = true
 
 /* eslint-disable no-new */
 new Vue({
