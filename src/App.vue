@@ -9,7 +9,7 @@
     <el-footer height="35px">
       <div class="fontset">
         <svg-icon icon-class="github-aa-brightgreen"/>
-        <el-link href="https://github.com/xc01/aa/tree/master">powered by: lmf xc qxw</el-link>
+        <el-link href="https://github.com/xc01/aa">powered by: lmf xc qxw</el-link>
       </div>
     </el-footer>
   </el-container>
