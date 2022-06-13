@@ -9,7 +9,8 @@
             <div slot="header" class="clearfix">
               <el-col :md="24" :lg="15" :offset="0"><span>{{ pj.name }}</span> </el-col>
               <el-col :md="24" :lg="8" :offset="1">
-              <el-popconfirm  v-if="priority"
+              <div v-if="priority">
+              <el-popconfirm
                 confirm-button-text='查看任务详情'
                 cancel-button-text='查看相关人员'
                 icon="el-icon-info"
@@ -20,7 +21,10 @@
               >
               <el-button slot='reference' style="float: right; padding: 3px 0" type="text">查看详情</el-button>
               </el-popconfirm>
-              <el-button v-else slot='reference' style="float: right; padding: 3px 0" type="text" @click="get_code(pj.pid)">查看任务详情</el-button>
+              </div>
+              <div v-else>
+              <el-button slot='reference' style="float: right; padding: 3px 0" type="text" @click="get_code(pj.pid)">查看任务详情</el-button>
+              </div>
               </el-col>
             </div>
             <el-upload
@@ -34,9 +38,12 @@
               <div slot="tip" class="el-upload__tip">请上传项目压缩包为文件</div>
             </el-upload>
             <!-- <el-button size="small" type="primary" @click="begin_export(pj.pid)">导出项目</el-button> -->
-            <div class="row-foot">
+            <div class="row-foot" v-if="priority">
               <el-link href="#" download="" style="margin-right: 5px">导出</el-link>
-              <el-button v-if="priority" @click="estimate(pj.pid)">分析</el-button>
+              <el-button @click="estimate(pj.pid)">分析</el-button>
+            </div>
+            <div class="row-foot-2" v-else>
+              <el-link href="#" download="">导出</el-link>
             </div>
           </el-card>
         </el-col>
@@ -56,6 +63,7 @@
 </template>
 
 <script>
+import qs from 'Qs'
 export default { // projectList 组件
   name: 'projectList',
   props: {  // 接受来自父元素的数据
@@ -91,9 +99,18 @@ export default { // projectList 组件
     },
 
     get_code: function(pid) { // 查看项目
-      // ...
-      this.entered = true;
-      this.$router.push({'name': 'codeView', params: {pid: pid}}) // 加载页面
+      var that = this;
+      this.$axios.post('/api/read_project_data/', qs.stringify({ //todo
+          uid: localStorage.getItem("uid"),
+          pid: pid,
+          estimate: true
+      })).then(function(res){
+          console.log(res.data)
+          that.entered = true;
+          that.$router.push({'name': 'codeView', params: {pid: pid}}) // 加载页面
+      }, function(res) {
+          that.$message.error("加入失败，或您已经在这个项目中了");
+      })
     },
 
     export_pj: function() {
@@ -155,7 +172,6 @@ export default { // projectList 组件
       // 在此刷新数据
     },
     getList(data, num, size) {
-      console.log(data, num, size)
       let list, total, start, end, isFirst, isLast
       total = data.length
       isFirst = total < size
@@ -226,9 +242,18 @@ export default { // projectList 组件
   .row-foot {
     position: absolute;
     margin-top: 2%;
-    margin-left: 14%;
+    margin-left: 12%;
+  }
+  .row-foot-2 {
+    position: absolute;
+    margin-top: 3%;
+    margin-left: 20%;
   }
   .loadbutton {
     margin-top: 8px;
+  }
+
+  .el-pagination {
+    margin-top: 8%;
   }
 </style>

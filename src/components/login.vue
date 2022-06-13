@@ -212,15 +212,15 @@ export default {
                     
                     this.loading = true;
                     var that = this;
-                    this.$axios.post('http://139.196.225.67:8008/login/', qs.stringify({
+                    this.$axios.post('/api/login/', qs.stringify({
                         username: this.loginForm.username,
                         password: this.loginForm.password
                     })).then((res) => {
-                        console.log(res)
                         that.loading = false;
                         // localStorage.setItem('username', this.loginForm.username); // 加入本地储存
                         localStorage.setItem('login', "1");  // 设置登录状态
                         localStorage.setItem('username', this.loginForm.username); // 加入本地储存
+                        localStorage.setItem('uid', Number(res.data.substring(24))); // 加入本地储存
                         that.$message.success('登录成功');
                         that.$router.replace('/'); // 跳转路径
                         this.timer = setTimeout(() => { // 设置计时器 2s 后登录失效
@@ -253,12 +253,11 @@ export default {
                 if (valid) {
                     this.loading = true;
                     var that = this;
-                    this.$axios.post('http://139.196.225.67:8008/insert_user/', qs.stringify({
+                    this.$axios.post('/api/insert_user/', qs.stringify({
                         username: this.registerForm.username,
                         email: this.registerForm.email,
                         password: this.registerForm.registerpassword
                     })).then((res) => {
-                        console.log(res)
                         if (res.data.substring(0, 11) != 'Sucessfully') {
                             this.$message.error(res.data);
                             return false;

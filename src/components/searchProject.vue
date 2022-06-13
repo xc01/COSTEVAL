@@ -93,7 +93,7 @@ export default {
                 cancelButtonText: '取消',
                 inputPattern: /^[\u4e00-\u9fa5a-z0-9]+.{2,30}/,
                 inputErrorMessage: '输入长度至少为2, 请勿出现特殊字符'
-            }).then(({ name }) => { // 验证成功
+            }).then(({ value }) => { // 验证成功
                 // test
                 // var fakedata = {
                 //     name: name,
@@ -104,28 +104,34 @@ export default {
                 // this.$emit('addProjectSuccess', new_project) // 触发事件 addProjectSuccess, 以便父组件添加到列表
                 // this.$message.success("新建项目成功！请在\"分析项目\"处查看")
                 // this.List = this.getfakelist();
-                this.$axios.post('http://139.196.225.67:8008/insert_project_data/', qs.stringify({
-                        project_name: name
-                    })).then(function(res){
+                var that=this;
+                this.$axios.post('/api/insert_project_data/', qs.stringify({
+                    "project_name": value
+                })).then(function(res){
+                        if (res.data.substring(0, 6) != "Sucess") {
+                            that.$message.error("请输入项目名称")
+                            return 1
+                        }
                     // todo，添加回project list
-                    var new_project = {
-                        name: name,
-                        id: res.id
-                    }
-                    this.$emit('addProjectSuccess', new_project) // 触发事件 addProjectSuccess, 以便父组件添加到列表
-                    this.$message.success("新建项目成功！请在\"分析项目\"处查看")
-                    this.search()
-                }, function(err){
-                    this.$message.error("项目创建失败，请稍后再试")
-                })
-            }).catch((err) => { // 取消
-                this.$message.info("取消添加")
-            });
+                        var new_project = {
+                            name: value,
+                            id: res.id
+                        }
+                        that.$emit('addProjectSuccess', new_project) // 触发事件 addProjectSuccess, 以便父组件添加到列表
+                        that.$message.success("新建项目成功！请在\"分析项目\"处查看")
+                        that.search()
+                    }, function(err){
+                        that.$message.error("项目创建失败，请稍后再试")
+                    })
+                }).catch((err) => { // 取消
+                    this.$message.info("取消添加")
+                });
         },
 
         search: function() { // 搜索
             // test
             this.searched = true;
+            this.List = [];
             // var fakeResultList = []
             // for (let i = 0; i < fakelist.length; i++) {
             //     if (fakelist[i].name.search(this.keyword) >= 0) {
@@ -134,11 +140,11 @@ export default {
             // }
             // this.List = fakeResultList;
             var that = this;
-            this.$axios.get('http://139.196.225.67:8008/get_all_projects/').then(function(res){
+            this.$axios.get('/api/get_all_projects/').then(function(res){
                 var strlist = res.data.split("}");
                 for (var str of strlist) {
                     str = str.replace(/ name/, "name")
-                    that.List.push(eval("("+str+"})"))
+                    that.List.push(eval("("+str+`})`))
                 }
             }, function(err) {
                 that.$message.error("搜索请求失败, 状态码:" + err.status)
@@ -147,13 +153,16 @@ export default {
 
         addToProject: function(item) {
             // test
-            console.log(item)
             var that = this;
-            this.$axios.get('http://139.196.225.67:8008/modify_authority', qs.stringify({
-                username: localStorage.getItem("username"),
-                id: item.id,
+            this.$axios.post('/api/modify_authority/', qs.stringify({ //todo
+                uid: localStorage.getItem("uid"),
+                pid: item.id,
                 authority: "auditor"
-            })).then(function(res){
+            })).then(function(res) {
+                if (res.data.substring(0, 6) != "Sucess") {
+                    that.$message.error("加入失败，或您已经在这个项目中了")
+                    return 1
+                }
                 that.$emit('participateNewProject', item); // 触发事件 participateNewProject , 使主页面更新
                 that.$message.success("加入成功");
             }, function(res) {

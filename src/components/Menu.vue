@@ -40,7 +40,7 @@
                 <el-tab-pane label="欢迎" index="1" style="width: 100%; padding: 24px ">
                     <welcome :usr="usr"></welcome>
                 </el-tab-pane>
-                <el-tab-pane label="管理项目" index="2" style="width: 100%; padding: 24px ">
+                <el-tab-pane label="搜索项目" index="2" style="width: 100%; padding: 24px ">
                     <search-project :uid="uid" @addProjectSuccess="updateList_create" @deleteProjectSuccess="updateList_delete" @participateNewProject="updateList_engage" />
                 </el-tab-pane>
                 <el-tab-pane label="分析项目" index="3" style="width: 100%; padding: 24px ">
@@ -75,14 +75,10 @@
 </template>
 
 <script>
+import qs from 'Qs'
 
-var project =  [{name: 'pj1', pid: 1, authrity: 1},
-                {name: 'pj2', pid: 2, authrity: 1},
-                {name: 'pj3', pid: 3, authrity: 1},
-                {name: 'pj4', pid: 4, authrity: 0},
-                {name: 'pj5', pid: 5, authrity: 1},
-                {name: 'pj6', pid: 6, authrity: 1},
-                {name: 'pj7', pid: 7, authrity: 0}]
+var project =  []
+// {name: 'pj1', pid: 1, authrity: 1}
 
 export default {
     name: "Menu",
@@ -95,14 +91,6 @@ export default {
         //     console.log(err)
         //   }
         // )
-
-        var project_list_0 = [], project_list_1 = []
-        for (let i = 0; i < project.length; i++) { // 将数组分为两类，一类是审计权限，一类是分析权限
-            if (project[i].authrity == 0)
-                project_list_0.push(project[i])
-            else
-                project_list_1.push(project[i])
-        }
         var login = localStorage.getItem("login"); // 获取登录状态
         if (login != "1") {
             login = false;
@@ -117,16 +105,46 @@ export default {
             dynamicTags: ["新人审计师"],
             src: "https://api.ixiaowai.cn/gqapi/gqapi.php",
             exportPath: null, // 导出到的文件夹
-            project_list_0: project_list_0,
-            project_list_1: project_list_1,
+            project_list_0: [],
+            project_list_1: [],
             login: login,
             inputVisible: false,
-            inputvalue: ""
+            inputvalue: "",
+            pjData: []
         }
     },
     methods: {
+        setdata: function() {
+            var that = this;
+            var pjData = this.pjData
+            this.$axios.get('/api/get_all_projects/').then(function(res){
+                var strlist = res.data.split("}");
+                for (var str of strlist) {
+                    str = str.replace(/ name/, "name")
+                    if (str.length > 1) {
+                        pjData.push(eval("("+str+"})")) 
+                    }
+                }
+            }, function(err) {
+                that.$message.error("搜索请求失败, 状态码:" + err.status)
+            });
+            console.log(pjData)
+            for (var pjd of pjData) {
+                project.push(this.check_auth(pjd))
+                console.log(project)
+            }
+            console.log(project.length)
+            console.log(project)
+            for (var pjd of project) { // 将数组分为两类，一类是审计权限，一类是分析权限
+                console.log(pjd)
+                if (pjd.authrity == 0)
+                    this.project_list_0.push(pjd)
+                else
+                    this.project_list_1.push(pjd)
+            }
+        },
         handleLogout: function() { // 登出
-            this.$axios.get('http://139.196.225.67:8008/logout/').then(function(res){
+            this.$axios.get('/api/logout/').then(function(res){
                 localStorage.clear(); // 清空缓存
                 localStorage.setItem("login", "0");
                 this.login = false;
@@ -194,9 +212,22 @@ export default {
             this.dynamicTags.push(this.inputvalue)
             this.inputVisible = false
             this.inputvalue = ''
+        },
+        
+        async check_auth(pjd) {
+            await this.$axios.post('/api/read_project_data/', qs.stringify({ //todo
+                uid: localStorage.getItem("uid"),
+                pid: pjd.id,
+                estimate: false
+            })).then(function(res) {
+                if (res.data.substring(0, 6) == "Sucess") {
+                    return ({name: pjd.name, pid: pjd.id, authrity: 1})
+                }
+            }, function(res) {
+                console.log(res)
+            })
         }
     },
-
     mounted () {
         document.getElementsByTagName("body")[0].style.backgroundColor = "rgb(198, 213, 241)";
         
@@ -207,8 +238,9 @@ export default {
         document.addEventListener('logout', () => { // 监听登录超时事件
             this.handleLogout();
         })
-    },
 
+        this.setdata()
+    },
     watch: {
         'login'(nv, ov) { // 如果登录过时，则返回登录界面
             if (nv == "0" || nv == false) {
@@ -251,7 +283,7 @@ export default {
 }
 
 .tabStyle {
-    height: 550px;
+    height: 580px;
 }
 
 .input-new-tag {

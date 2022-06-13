@@ -14,8 +14,6 @@ import login from './components/login'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'   //样式表
 import axios, { Axios } from 'axios'
-import './components/svgiconfont'
-import '@/assets/icons/index.js'
 
 Vue.config.productionTip = false
 Vue.component('project-list', projectList)  // 注册组件

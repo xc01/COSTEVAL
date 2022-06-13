@@ -1,12 +1,16 @@
 <template>
     <div>
-        <el-page-header @back="$emit('back')" content="评估">
-            </el-page-header>
-        <h2>请选择评估模型</h2>
+        <el-page-header @back="$emit('back')" content="请选择评估模型">
+        </el-page-header>
         <el-row>
-            <el-col>
-                <el-button @click="chooseMode('cocomo81')">COCOMO81 模型</el-button>
-                <i>这是 cocomo81 模型</i>
+            <el-col :span="11">
+                <el-link @click="chooseMode('cocomo81')" :underline="false">
+                    <el-card>
+                        <img src="../assets/coco.png" width="100%">
+                        <el-divider />
+                        <i>COCOMO81 模型</i>
+                    </el-card>
+                </el-link>
                 <el-drawer
                 title="请输入 COCOMO81 模型的评估参数"
                 :before-close="HandleClose"
@@ -110,9 +114,14 @@
                     <el-button type="primary" @click="submit" :loading="loading">{{ loading ? '提交中 ...' : '确 定' }}</el-button>
                 </el-drawer>
             </el-col>
-            <el-col>
-                <el-button @click="chooseMode('cocomoii')">COCOMO II 模型</el-button>
-                <i>这是 cocomo II  模型</i>
+            <el-col :span="11" :offset="1">
+                <el-link @click="chooseMode('cocomoii')" :underline="false">
+                    <el-card>
+                        <img src="../assets/coc2.png" width="100%">
+                        <el-divider />
+                        <i>COCOMO II 模型</i>
+                    </el-card>
+                </el-link>
                 <el-drawer title="请输入 COCOMOII 模型的评估参数"
                 :before-close="HandleClose"
                 :visible.sync="cocomoii"
@@ -139,9 +148,14 @@
                     <el-button type="primary" @click="submit" :loading="loading">{{ loading ? '提交中 ...' : '确 定' }}</el-button>
                 </el-drawer>
             </el-col>
-            <el-col>
-                <el-button @click="chooseMode('regression')">回归模型</el-button>
-                <i>这是回归模型</i>
+            <el-col :span="11">
+                <el-link @click="chooseMode('regression')" :underline="false">
+                    <el-card>
+                        <img src="../assets/reg.png" width="100%">
+                        <el-divider />
+                        <i>回归 模型</i>
+                    </el-card>
+                </el-link>
                 <el-drawer title="请输入 Regression 模型的评估参数"
                 :before-close="HandleClose"
                 :visible.sync="regression"
@@ -156,9 +170,14 @@
                     <el-button type="primary" @click="submit" :loading="loading">{{ loading ? '提交中 ...' : '确 定' }}</el-button>
                 </el-drawer>
             </el-col>
-            <el-col>
-                <el-button @click="chooseMode('analogy')">类比分析</el-button>
-                <i>这是类比分析模型</i>
+            <el-col :span="11" :offset="1">
+                <el-link @click="chooseMode('analogy')" :underline="false">
+                    <el-card>
+                        <img src="../assets/ana.png" width="100%">
+                        <el-divider />
+                        <i>类比分析 模型</i>
+                    </el-card>
+                </el-link>
                 <el-drawer title="请输入 Analogy 模型的评估参数"
                 :before-close="HandleClose"
                 :visible.sync="analogy"
@@ -300,3 +319,11 @@ export default {
     }
 }
 </script>
+<style scoped>
+    .el-card {
+        margin: 10px 10px 10px 10px;
+    }
+    .el-divider {
+        margin-top: -10px;
+    }
+</style>
