@@ -76,8 +76,7 @@
 
 <script>
 import qs from 'Qs'
-
-var project =  []
+var project= []
 // {name: 'pj1', pid: 1, authrity: 1}
 
 export default {
@@ -91,6 +90,7 @@ export default {
         //     console.log(err)
         //   }
         // )
+
         var login = localStorage.getItem("login"); // 获取登录状态
         if (login != "1") {
             login = false;
@@ -109,39 +109,42 @@ export default {
             project_list_1: [],
             login: login,
             inputVisible: false,
-            inputvalue: "",
-            pjData: []
+            inputvalue: ""
         }
     },
     methods: {
         setdata: function() {
+            var temppj = []
             var that = this;
-            var pjData = this.pjData
-            this.$axios.get('/api/get_all_projects/').then(function(res){
+            this.$axios.post('/api/get_auth/', qs.stringify({
+                uid: localStorage.getItem("uid")
+            })).then(function(res){
                 var strlist = res.data.split("}");
                 for (var str of strlist) {
-                    str = str.replace(/ name/, "name")
                     if (str.length > 1) {
-                        pjData.push(eval("("+str+"})")) 
+                        var pjData = eval("("+str+"})")
+                        var auth = 0;
+                        switch(pjData.auth) {
+                            case "creator":
+                                auth = 2;
+                                break;
+                            case "auth":
+                                auth = 2;
+                                break;
+                            case "user+":
+                                auth = 1;
+                                break;
+                            default:
+                                auth = 0;
+                                break;
+                        }
+                        temppj.push(JSON.parse(JSON.stringify({name: pjData.name, pid: pjData.pid, authrity: auth})))
                     }
                 }
             }, function(err) {
                 that.$message.error("搜索请求失败, 状态码:" + err.status)
             });
-            console.log(pjData)
-            for (var pjd of pjData) {
-                project.push(this.check_auth(pjd))
-                console.log(project)
-            }
-            console.log(project.length)
-            console.log(project)
-            for (var pjd of project) { // 将数组分为两类，一类是审计权限，一类是分析权限
-                console.log(pjd)
-                if (pjd.authrity == 0)
-                    this.project_list_0.push(pjd)
-                else
-                    this.project_list_1.push(pjd)
-            }
+            console.log(temppj)
         },
         handleLogout: function() { // 登出
             this.$axios.get('/api/logout/').then(function(res){
@@ -212,20 +215,6 @@ export default {
             this.dynamicTags.push(this.inputvalue)
             this.inputVisible = false
             this.inputvalue = ''
-        },
-        
-        async check_auth(pjd) {
-            await this.$axios.post('/api/read_project_data/', qs.stringify({ //todo
-                uid: localStorage.getItem("uid"),
-                pid: pjd.id,
-                estimate: false
-            })).then(function(res) {
-                if (res.data.substring(0, 6) == "Sucess") {
-                    return ({name: pjd.name, pid: pjd.id, authrity: 1})
-                }
-            }, function(res) {
-                console.log(res)
-            })
         }
     },
     mounted () {
@@ -238,7 +227,7 @@ export default {
         document.addEventListener('logout', () => { // 监听登录超时事件
             this.handleLogout();
         })
-
+        
         this.setdata()
     },
     watch: {

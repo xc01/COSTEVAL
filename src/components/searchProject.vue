@@ -15,7 +15,7 @@
             </el-row>
         </div>
         <el-table class="searched" v-show="searched"
-            :data="List"
+            :data="searchList"
             style="width: 100%">
             <el-table-column label="项目名称" prop="name" />
             <el-table-column label="id" prop="id" />
@@ -71,7 +71,8 @@ export default {
                 uid: this.uid,
                 pagenum: 1,
                 pagesize: 20
-            }
+            },
+            searchList: []
         }
     }, 
     methods: {
@@ -129,26 +130,26 @@ export default {
         },
 
         search: function() { // 搜索
-            // test
             this.searched = true;
-            this.List = [];
-            // var fakeResultList = []
-            // for (let i = 0; i < fakelist.length; i++) {
-            //     if (fakelist[i].name.search(this.keyword) >= 0) {
-            //         fakeResultList.push(fakelist[i])
-            //     }
-            // }
-            // this.List = fakeResultList;
             var that = this;
+            var list = [];
+            // this.$axios.get('/api/get_all_projects/').then(function(res){
             this.$axios.get('/api/get_all_projects/').then(function(res){
+
                 var strlist = res.data.split("}");
+                console.log(strlist)
                 for (var str of strlist) {
-                    str = str.replace(/ name/, "name")
-                    that.List.push(eval("("+str+`})`))
+                    if (str != "") {
+                        str = str.replace(/ name/, "name")
+                        if (that.keyword == "" || str.split(": ")[2].search(that.keyword) >= 0) {
+                            list.push(eval("("+str+"})"))
+                        }
+                    }
                 }
             }, function(err) {
                 that.$message.error("搜索请求失败, 状态码:" + err.status)
             });
+            this.searchList = list;
         },
 
         addToProject: function(item) {
