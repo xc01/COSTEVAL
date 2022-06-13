@@ -17,7 +17,7 @@
                 icon-color="green"
                 title="请选择需要查看的对象" 
                 @confirm="get_code(pj.pid)"
-                @cancel="check_persons(pj.pid)"
+                @cancel="check_persons(pj.pid, pj.authrity)"
               >
               <el-button slot='reference' style="float: right; padding: 3px 0" type="text">查看详情</el-button>
               </el-popconfirm>
@@ -126,10 +126,11 @@ export default { // projectList 组件
       // ... 保存到本地
     },
 
-    check_persons: function(pid) { // 查看人员
+    check_persons: function(pid, auth) { // 查看人员
       // ...
+      console.log(auth)
       this.entered = true;
-      this.$router.push({'name': 'personView', params: {pid: pid}})
+      this.$router.push({'name': 'personView', params: {pid: pid, auth: auth}})
     },
 
     estimate: function(pid) { // 评估项目

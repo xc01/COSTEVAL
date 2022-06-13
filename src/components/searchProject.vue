@@ -158,7 +158,7 @@ export default {
             this.$axios.post('/api/modify_authority/', qs.stringify({ //todo
                 uid: localStorage.getItem("uid"),
                 pid: item.id,
-                authority: "auditor"
+                authority: "read"
             })).then(function(res) {
                 if (res.data.substring(0, 6) != "Sucess") {
                     that.$message.error("加入失败，或您已经在这个项目中了")

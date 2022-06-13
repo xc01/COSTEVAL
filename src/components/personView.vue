@@ -1,15 +1,23 @@
 <template>
-    <div>
+    <div v-if="auth == 2">
         <el-page-header @back="$emit('back')" content="查看项目相关人员"> </el-page-header>
-        <el-input placeholder="请输入用户名称" v-model="keyword" class="input-with-select" @keyup.enter.native="search">
-            <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
-        </el-input>
-        <ul>
-            <li v-for="person in personList" :key="person.uid">
-                <span>{{ person.username }}</span>
-                <el-button @click="BeginEdit(person.name, person.uid, person.priority)">修改权限</el-button>
-            </li>
-        </ul>
+        <el-table class="searched"
+            :data="personList"
+            style="width: 95%">
+            <el-table-column label="成员名称" prop="username" />
+            <el-table-column label="uid" prop="uid" />
+            <el-table-column align="right">
+                <template slot="header" slot-scope="scope">
+                    <el-input size="mini"
+                        placeholder="请输入成员名称" v-model="keyword" class="input-with-select" @keyup.enter.native="search" clearable>
+                        <el-button slot="append" size="mini" @click="addUser">添加成员</el-button>
+                    </el-input>
+                </template>
+                <template slot-scope="scope">
+                    <el-button size="mini" @click="BeginEdit(scope.row)">修改权限</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
         <el-drawer
         :title="'请设置用户 ' + selectedUsr + ' 的权限'"
         :before-close="handleClose"
@@ -17,12 +25,12 @@
         ref="drawer"
         >
             <el-form ref="form" label-width="60px">
-                <el-form-item label="选择权限">
-                    <el-radio-group v-model="selectedPriority">
+                <el-form-item label="">
+                    <el-radio-group v-model="selectedauth">
                         <el-col :span="6">
+                            <el-radio label="2">管理员</el-radio>
                             <el-radio label="1">分析师</el-radio>
                             <el-radio label="0">审计师</el-radio>
-                            <el-radio label="-1">从项目中删除该成员</el-radio>
                         </el-col>
                     </el-radio-group>
                 </el-form-item>
@@ -31,55 +39,65 @@
             <el-button type="primary" @click="submit" :loading="loading">{{ loading ? '提交中 ...' : '确 定' }}</el-button>
         </el-drawer>
     </div>
+    <div v-else>
+        <el-page-header @back="$emit('back')" content="查看项目相关人员"> </el-page-header>
+        <h2>您没有权限查看该页面</h2>
+    </div>
 </template>
 
 <script>
+import qs from 'Qs'
 //test
-var personList = [
-    {username: "aaa", uid: 22, priority: 0},
-    {username: "bbb", uid: 33, priority: 1},
-    {username: "ccc", uid: 44, priority: 1},
-    {username: "ddd", uid: 55, priority: 0}
-];
+// {username: "ddd", uid: 55, auth: 0}
 
 export default {
     name: "personView",
     // props: ['pid'],
     data () {
-        var params = {
-            pid: this.$route.params.pid
-        };
 
-        // personList = this.loadData(params);
         // if (personList == null) {
         //     this.$message.error("加载人员列表出错");
         // }
-
         return {
             pid: this.$route.params.pid,
+            auth: this.$route.params.auth,
             keyword: '', // 搜索关键词
-            personList: personList,
+            personList: [],
             drawer: false,  // 抽屉是否打开
             loading: false, 
-            selectedPriority: 0, // 需要新设置的权限
+            selectedauth: 0, // 需要新设置的权限
             selectedUsr: "",
             selectedUid: 0
         }
     },
 
     methods: {
-        loadData: function(params) {
-            var data = null;
-            this.$axios.get('url', params).then(function(res){
-                data = res.data
+        async loadData(params) {
+            this.personList = await this.getdata(params);
+        },
+        async getdata(params) {
+            var data = [];
+            var that=this;
+            await this.$axios.post('/api/get_all_users/', qs.stringify(params)).then(function(res){
+                var strlist = res.data.split("}")
+                for (var str of strlist) {
+                    if (str != "") {
+                        str = str.replace(/name/, "name")
+                        console.log(str)
+                        if (that.keyword == "" || str.split(": ")[2].search(that.keyword) >= 0) {
+                            data.push(eval("("+str+"})"))
+                        }
+                    }
+                }
+            }, function(err){
+                that.$message.error("成员加载失败")
             })
             return data;
         },
-
-        BeginEdit: function(name, uid, prio) { // 开始修改
-            this.selectedUsr = name
-            this.selectedUid = uid
-            this.selectedPriority = prio
+        BeginEdit: function(row) { // 开始修改
+            this.selectedUsr = row.username
+            this.selectedUid = row.uid
+            this.selectedauth = row.auth
             this.drawer = true // 打开抽屉进行修改
         },
 
@@ -103,39 +121,49 @@ export default {
             if (this.loading) {
                 return;
             }
-            
+            var au = ""
+            console.log(this.selectedauth)
+            switch(this.selectedauth) {
+                case "2":
+                    au = "auth";
+                    break;
+                case "1":
+                    au = "read+";
+                    break;
+                default:
+                    au = "read";
+                    break;
+            }            
             this.loading = true;
             var that = this;
             var params = {
                 pid: this.pid,
                 uid: this.selectedUid,
-                prio: this.selectedPriority
+                authority: au
             }
             console.log(params);
-            // test
-            if (this.selectedPriority < 0) { // 删除人员
-                for (let i = 0; i < this.personList.length; i++) {
-                    if (this.personList[i].uid == this.selectedUid) { // 找到了需要移除的人员
-                        this.personList.splice(i, 1); // 删除
-                    }
-                }
-            }
-            that.$message.success("修改成功！");
-            this.cancelForm(); // 关闭抽屉
-            // this.$axios.post('url', params, {timeout: 5000}).then(function(res) {
-            //     if (this.selectedPriority < 0) { // 删除人员
-            //         for (let i = 0; i < this.personList.length; i++) {
-            //             if (this.personList[i].uid == that.selectedUid) { // 找到了需要移除的人员
-            //                 this.personList.splice(i, 1); // 删除
-            //             }
+            // // test
+            // if (this.selectedauth < 0) { // 删除人员
+            //     for (let i = 0; i < this.personList.length; i++) {
+            //         if (this.personList[i].uid == this.selectedUid) { // 找到了需要移除的人员
+            //             this.personList.splice(i, 1); // 删除
             //         }
             //     }
-            //     that.$message.success("修改成功！");
-            //     this.cancelForm(); // 关闭抽屉
-            // }, function(err){
-            //     that.$message.error("修改失败");
-            //     that.loading = false;
-            // })
+            // }
+            // that.$message.success("修改成功！");
+            // this.cancelForm(); // 关闭抽屉
+            
+            var that=this;
+            this.$axios.post('/api/modify_authority/', qs.stringify({params})).then(function(res){
+                if (res.data.substring(0, 6) != "Sucess") {
+                    that.$message.error("修改失败")
+                    return 1
+                }
+                that.$message.success("修改成功！");
+                this.cancelForm(); // 关闭抽屉
+            }).catch((err) => { // 取消
+                this.$message.info("取消添加")
+            });
         },
          
         search: function() {
@@ -150,7 +178,45 @@ export default {
                 }
             }
             this.personList = searchedPersonList;
-        }
+        },
+        addUser: function() {
+            this.$prompt('请输入用户uid', '添加成员',{
+                confirmButtonText: '确定',
+                cancelButtonText: '取消'
+            }).then(({ value }) => { // 验证成功
+                // test
+                // var fakedata = {
+                //     name: name,
+                //     id: 10
+                // }
+                // fakelist.push(fakedata)
+                // var new_project = fakedata
+                // this.$emit('addProjectSuccess', new_project) // 触发事件 addProjectSuccess, 以便父组件添加到列表
+                // this.$message.success("新建项目成功！请在\"分析项目\"处查看")
+                // this.List = this.getfakelist();
+                var that=this;
+                this.$axios.post('/api/modify_authority/', qs.stringify({
+                    uid: value,
+                    pid: this.pid,
+                    authority: "read"
+                })).then(function(res){
+                    if (res.data.substring(0, 6) != "Sucess") {
+                        that.$message.error("加入失败，或已经在这个项目中了")
+                        return 1
+                    }
+                    that.$message.success("加入成功");
+                }).catch((err) => { // 取消
+                    this.$message.info("取消添加")
+                });
+            });
+        },
+    },
+    mounted() {
+        var params = {
+            pid: this.$route.params.pid
+        };
+        this.loadData(params);
+        console.log(this.personList)
     },
 
     watch: {

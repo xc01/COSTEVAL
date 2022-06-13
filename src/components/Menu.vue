@@ -121,7 +121,6 @@ export default {
                 else
                     this.project_list_1.push({name: write.name, pid: write.pid, authrity: write.authrity})
             }
-            console.log(this.project_list_1)
         },
         handleLogout: function() { // 登出
             this.$axios.get('/api/logout/').then(function(res){
@@ -212,7 +211,7 @@ export default {
                             case "auth":
                                 auth = 2;
                                 break;
-                            case "user+":
+                            case "read+":
                                 auth = 1;
                                 break;
                             default:
