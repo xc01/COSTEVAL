@@ -27,7 +27,7 @@
                     </el-autocomplete>
                 </template>
                 <template slot-scope="scope">
-                    <el-button size="mini" @click="addToProject(scope.row)">加入</el-button>
+                    <el-button size="mini" @click="addToProject(scope.row)">添加成员</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -153,24 +153,39 @@ export default {
         },
 
         addToProject: function(item) {
-            // test
-            var that = this;
-            this.$axios.post('/api/modify_authority/', qs.stringify({ //todo
-                uid: localStorage.getItem("uid"),
-                pid: item.id,
-                authority: "read"
-            })).then(function(res) {
-                if (res.data.substring(0, 6) != "Sucess") {
-                    that.$message.error("加入失败，或您已经在这个项目中了")
-                    return 1
-                }
-                that.$emit('participateNewProject', item); // 触发事件 participateNewProject , 使主页面更新
-                that.$message.success("加入成功");
-            }, function(res) {
-                that.$message.error("加入失败，或您已经在这个项目中了");
-            })
-            this.$emit('participateNewProject', item); // 触发事件 participateNewProject , 使主页面更新
-            this.$message.success("加入成功");
+            this.$prompt('请输入用户uid', '添加成员',{
+                confirmButtonText: '确定',
+                cancelButtonText: '取消'
+            }).then(({ value }) => { // 验证成功
+                // test
+                // var fakedata = {
+                //     name: name,
+                //     id: 10
+                // }
+                // fakelist.push(fakedata)
+                // var new_project = fakedata
+                // this.$emit('addProjectSuccess', new_project) // 触发事件 addProjectSuccess, 以便父组件添加到列表
+                // this.$message.success("新建项目成功！请在\"分析项目\"处查看")
+                // this.List = this.getfakelist();
+                var that = this;
+                this.$axios.post('/api/modify_authority/', qs.stringify({
+                    uid: value,
+                    pid: item.id,
+                    authority: "read"
+                })).then(function(res){
+                    if (res.data.substring(0, 6) == "Modifi") {
+                        that.$message.error("已经在这个项目中了")
+                        return 1;
+                    } else if (res.data.substring(0, 5) == "Added") {
+                        that.$message.success("加入成功");
+                        return 1;
+                    } else {
+                        that.$message.error("加入失败")
+                    }
+                }).catch((err) => { // 取消
+                    this.$message.info("取消添加")
+                });
+            });
         },
         handleSelect(item) {
             console.log(item);

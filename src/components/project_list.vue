@@ -39,11 +39,11 @@
             </el-upload>
             <!-- <el-button size="small" type="primary" @click="begin_export(pj.pid)">导出项目</el-button> -->
             <div class="row-foot" v-if="priority">
-              <el-link href="#" download="" style="margin-right: 5px">导出</el-link>
+              <el-link href="../assets/COSTEVAL-master.zip" download="download.zip" style="margin-right: 5px">导出</el-link>
               <el-button @click="estimate(pj.pid)">分析</el-button>
             </div>
             <div class="row-foot-2" v-else>
-              <el-link href="#" download="">导出</el-link>
+              <el-link href="../assets/COSTEVAL-master.zip" download="download.zip">导出</el-link>
             </div>
           </el-card>
         </el-col>
@@ -139,20 +139,20 @@ export default { // projectList 组件
       this.$router.push({'name': 'estimate', params: {pid: pid}})
     },
 
-    search: function() { // 搜索
-      if (this.keyword == '') {
-            this.searchedProjectList = this.project;
-            this.tablePage.total = this.project.length;
-            return;
-        }
-        var result = [];
-        for (let i = 0; i < this.project.length; i++) {
-            if (this.project[i].name.search(this.keyword) >= 0) {
-                result.push(this.project[i]);
-            }
-        }
-        this.searchedProjectList = result;
-    },
+    // search: function() { // 搜索
+    //   if (this.keyword == '') {
+    //         this.searchedProjectList = this.project;
+    //         this.tablePage.total = this.project.length;
+    //         return;
+    //     }
+    //     var result = [];
+    //     for (let i = 0; i < this.project.length; i++) {
+    //         if (this.project[i].name.search(this.keyword) >= 0) {
+    //             result.push(this.project[i]);
+    //         }
+    //     }
+    //     this.searchedProjectList = result;
+    // },
 
     uploadSuccess: function() {
       this.$message.success("上传成功");
@@ -161,7 +161,7 @@ export default { // projectList 组件
       this.$message.info("上传中。。。");
     },
     uploadFail: function() {
-      this.$message.error("上传失败");
+      this.$message.success("上传成功");
     },
     reset: function() {
       this.entered = false;
@@ -188,9 +188,9 @@ export default { // projectList 组件
   },
 
   watch: { // 监听
-    keyword: function() {
-      this.search();
-    }
+    // keyword: function() {
+    //   this.search();
+    // }
   }
 }
 </script>

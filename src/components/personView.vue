@@ -136,12 +136,6 @@ export default {
             }            
             this.loading = true;
             var that = this;
-            var params = {
-                pid: this.pid,
-                uid: this.selectedUid,
-                authority: au
-            }
-            console.log(params);
             // // test
             // if (this.selectedauth < 0) { // 删除人员
             //     for (let i = 0; i < this.personList.length; i++) {
@@ -154,13 +148,17 @@ export default {
             // this.cancelForm(); // 关闭抽屉
             
             var that=this;
-            this.$axios.post('/api/modify_authority/', qs.stringify({params})).then(function(res){
-                if (res.data.substring(0, 6) != "Sucess") {
+            this.$axios.post('/api/modify_authority/', qs.stringify({
+                pid: this.pid,
+                uid: this.selectedUid,
+                authority: au
+            })).then(function(res){
+                if (res.data.substring(0, 6) != "Modifi") {
                     that.$message.error("修改失败")
                     return 1
                 }
                 that.$message.success("修改成功！");
-                this.cancelForm(); // 关闭抽屉
+                that.cancelForm(); // 关闭抽屉
             }).catch((err) => { // 取消
                 this.$message.info("取消添加")
             });
@@ -209,7 +207,7 @@ export default {
                     this.$message.info("取消添加")
                 });
             });
-        },
+        }
     },
     mounted() {
         var params = {
