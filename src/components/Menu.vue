@@ -113,38 +113,15 @@ export default {
         }
     },
     methods: {
-        setdata: function() {
-            var temppj = []
-            var that = this;
-            this.$axios.post('/api/get_auth/', qs.stringify({
-                uid: localStorage.getItem("uid")
-            })).then(function(res){
-                var strlist = res.data.split("}");
-                for (var str of strlist) {
-                    if (str.length > 1) {
-                        var pjData = eval("("+str+"})")
-                        var auth = 0;
-                        switch(pjData.auth) {
-                            case "creator":
-                                auth = 2;
-                                break;
-                            case "auth":
-                                auth = 2;
-                                break;
-                            case "user+":
-                                auth = 1;
-                                break;
-                            default:
-                                auth = 0;
-                                break;
-                        }
-                        temppj.push(JSON.parse(JSON.stringify({name: pjData.name, pid: pjData.pid, authrity: auth})))
-                    }
-                }
-            }, function(err) {
-                that.$message.error("搜索请求失败, 状态码:" + err.status)
-            });
-            console.log(temppj)
+        async setdata() {
+            var wt = await this.getdata()
+            for (var write of wt) {
+                if (write.auth == 0)
+                    this.project_list_0.push({name: write.name, pid: write.pid, authrity: write.authrity})
+                else
+                    this.project_list_1.push({name: write.name, pid: write.pid, authrity: write.authrity})
+            }
+            console.log(this.project_list_1)
         },
         handleLogout: function() { // 登出
             this.$axios.get('/api/logout/').then(function(res){
@@ -215,6 +192,40 @@ export default {
             this.dynamicTags.push(this.inputvalue)
             this.inputVisible = false
             this.inputvalue = ''
+        },
+        
+        async getdata() {
+            var temppj = []
+            var that = this;
+            await this.$axios.post('/api/get_auth/', qs.stringify({
+                uid: localStorage.getItem("uid")
+            })).then(function(res){
+                var strlist = res.data.split("}");
+                for (var str of strlist) {
+                    if (str.length > 1) {
+                        var pjData = eval("("+str+"})")
+                        var auth = 0;
+                        switch(pjData.auth) {
+                            case "creator":
+                                auth = 2;
+                                break;
+                            case "auth":
+                                auth = 2;
+                                break;
+                            case "user+":
+                                auth = 1;
+                                break;
+                            default:
+                                auth = 0;
+                                break;
+                        }
+                        temppj.push(JSON.parse(JSON.stringify({name: pjData.name, pid: pjData.pid, authrity: auth})))
+                    }
+                }
+            }, function(err) {
+                that.$message.error("搜索请求失败, 状态码:" + err.status)
+            });
+            return temppj
         }
     },
     mounted () {
